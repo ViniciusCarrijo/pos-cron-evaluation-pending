@@ -3,13 +3,14 @@ import { Channel, connect, Connection } from 'amqplib';
 
 @Injectable()
 export class RabbitService {
-  async publishInExchange(message: any): Promise<void> {
+  async publishInExchange(
+    message: any): Promise<void> {
     const connection = await this._connect();
     const channel = await this._createChannel(connection);
 
     try {
-      await channel.assertExchange({ durable: true });
-      channel.publish(Buffer.from(JSON.stringify(message)));
+      await channel.assertExchange('amq.topic', 'topic', { durable: true });
+      channel.publish('amq.topic','notificationEvaluationQueue',Buffer.from(JSON.stringify(message)));
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
@@ -19,7 +20,7 @@ export class RabbitService {
   }
 
   async _connect(): Promise<Connection> {
-    return connect(`amqp://guest:guest@192.168.18.9:5672/`).catch((error) => {
+    return connect(`amqp://guest:guest@localhost:5672/`).catch((error) => {
       throw new InternalServerErrorException(error.message);
     });
   }

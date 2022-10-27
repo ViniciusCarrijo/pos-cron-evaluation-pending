@@ -18,6 +18,7 @@ export class TaskDao {
 
     return this.schedulerRepository
       .createQueryBuilder('scheduler')
+      .innerJoinAndSelect('scheduler.user', 'user')
       .andWhere(
         `scheduler.finishedAt >= '${currentFullYear}-${currentMonth}-${currentDay} 00:00:00'`,
       )
